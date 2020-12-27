@@ -8,7 +8,7 @@ const { http } = createInitiator({
 })
 
 const enum Routes {
-  userLogin = '/user/profile',
+  userLogin = '/v1/users/sign_in',
   userAbilities = '/user/abilities'
 }
 
@@ -16,8 +16,10 @@ export function userLogin(username: string, password: string) {
   return http.post<Record<'token', string>, Record<'token', string>>(
     Routes.userLogin,
     {
-      username,
-      password
+      user: {
+        email: username,
+        password
+      }
     }
   )
 }

@@ -1,12 +1,16 @@
 import { Module } from 'vuex'
 import { RootState } from '../global'
 import { Ability, reset } from 'v-access'
-import { userLogin, fetchUserAbilities } from '@/effects'
+import { fetchUserAbilities } from '@/effects'
 import VueRouter from 'vue-router'
 import { RouteSetting } from '@/router'
+import { UserApi } from '@/api'
+import { AxiosResponse } from 'axios'
 
 export interface UserState {
-  token: string
+  accessToken: string
+  client: string
+  uid: string
   abilities: Ability[]
   routes: RouteSetting[]
 }
@@ -27,21 +31,25 @@ const user: Module<UserState, RootState> = {
   namespaced: true,
 
   state: {
-    token: '',
+    accessToken: '',
+    uid: '',
+    client: '',
     abilities: [],
     // this is user private routes, not all routes
     routes: []
   },
 
   getters: {
-    hasLogin({ token }) {
-      return Boolean(token)
+    hasLogin({ accessToken }) {
+      return Boolean(accessToken)
     }
   },
 
   mutations: {
-    [userMutationTypes.setToken](state, token) {
-      state.token = token
+    [userMutationTypes.setToken](state, { accessToken, uid, client }) {
+      state.accessToken = accessToken
+      state.uid = uid
+      state.client = client
     },
     [userMutationTypes.setUserAbilities](state, abilities) {
       state.abilities = abilities
@@ -52,13 +60,15 @@ const user: Module<UserState, RootState> = {
   },
 
   actions: {
-    async login(
-      { commit },
-      { username, password }: Record<'username' | 'password', string>
-    ) {
-      const { token } = await userLogin(username, password)
-      token && commit('setToken', token)
+    async login({ commit }, { username, password }): Promise<void> {
+      const response: AxiosResponse = await UserApi.login(username, password)
+      const accessToken = response.headers['access-token']
+      const uid = response.headers['uid']
+      const client = response.headers['client']
+
+      response && commit('setToken', { accessToken, uid, client })
     },
+
     async fetchUserAbilities({ commit }) {
       const abilities = await fetchUserAbilities()
 
@@ -69,6 +79,7 @@ const user: Module<UserState, RootState> = {
         commit('setUserAbilities', abilitiesIds)
       }
     },
+
     async logout({ dispatch }, router: VueRouter) {
       reset(router)
       await dispatch('resetState', null, { root: true })
