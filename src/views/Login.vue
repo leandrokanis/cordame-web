@@ -13,8 +13,7 @@
                 <span class="login__title">Login</span>
               </v-toolbar-title>
               <v-spacer />
-              <v-btn text small @click="asPreset('user')">as user</v-btn>
-              <v-btn text small @click="asPreset('admin')">as admin</v-btn>
+              <v-btn text small @click="asPreset()">usuario demo</v-btn>
             </v-toolbar>
 
             <v-card-text>
@@ -109,6 +108,7 @@ export default {
             password: this.password
           })
         )
+
         if (profileError) {
           errorLog(profileError)
           if (profileError.code === 403) {
@@ -124,33 +124,37 @@ export default {
          * request should be called after action named login, instead of
          * concurrent request.
          */
-        const [, abilitiesError] = await asyncTryCatch(
-          this.$store.dispatch('user/fetchUserAbilities')
-        )
-        if (abilitiesError) {
-          errorLog(abilitiesError)
-          if (abilitiesError.code === 403) {
-            this.toggleToastVisibility(true)
-            this.toastMessage = ERR_CODE.emptyAbilities
-          }
-          this.toggleLoading(false)
-          return
-        }
+        // const [, abilitiesError] = await asyncTryCatch(
+        //   this.$store.dispatch('user/fetchUserAbilities')
+        // )
+
+        // if (abilitiesError) {
+        //   errorLog(abilitiesError)
+        //   if (abilitiesError.code === 403) {
+        //     this.toggleToastVisibility(true)
+        //     this.toastMessage = ERR_CODE.emptyAbilities
+        //   }
+        //   this.toggleLoading(false)
+        //   return
+        // }
 
         this.$router.replace(this.$route.query[QUERY_KEY_FOR_LOGIN_TO] || '/')
       }
 
       this.toggleLoading(false)
     },
+
     toggleLoading(state) {
       this.isLoading = state || !this.isLoading
     },
+
     toggleToastVisibility(state) {
       this.toastVisibility = state || !this.toastVisibility
     },
-    asPreset(tag) {
-      this.username = tag
-      this.password = tag
+
+    asPreset() {
+      this.username = 'jorge@mailinator.com'
+      this.password = 'sec123!@#'
     }
   },
 
