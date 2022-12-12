@@ -15,7 +15,7 @@
     "core-js": "^3.6.4",
     "lodash.clonedeep": "^4.5.0",
     "normalize.css": "^8.0.1",
-    "qs": "^6.9.4",
+    "qs": "^6.9.7",
     "roboto-fontface": "*",
     "tiny-invariant": "^1.1.0",
     "v-access": "^2.1.1",
